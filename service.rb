@@ -109,3 +109,8 @@ get '/destinations/:trip_id/:sequence' do
     npi.humanize
   end.to_json
 end
+
+## DEFAULTS ##
+not_found do
+  { :error => 'not_found' }.to_json
+end
