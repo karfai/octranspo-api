@@ -1,8 +1,8 @@
-# Copyright 2009 Don Kelly <karfai@gmail.com>
+# Copyright 2009-2011 Don Kelly <karfai@gmail.com>
 
-# This file is part of voyageur.
+# This file is part of octranspo-api.
 
-# voyageur is free software: you can redistribute it and/or modify
+# octranspo-api is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -15,83 +15,113 @@
 # You should have received a copy of the GNU General Public License
 # along with voyageur.  If not, see <http://www.gnu.org/licenses/>.
 
+# TODO discontinue curses use
+
 from __future__ import with_statement
 
 import curses.wrapper
 import dateutil.parser
 import lxml.etree
 import os
-import schema
+import sqlite3
 import sys
 import urllib2
 import zipfile
 from datetime import *
 
+def make_schema(dbf):
+    conn = sqlite3.connect(dbf)
+    cur = conn.cursor()
+    cur.execute('CREATE TABLE stops (id INTEGER PRIMARY KEY AUTOINCREMENT, label TEXT, number INTEGER, name TEXT, lat FLOAT, lon FLOAT)')
+    cur.execute('CREATE TABLE routes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, route_type INTEGER)')
+    cur.execute('CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT, headsign TEXT, block INTEGER, route_id INTEGER, service_period_id INTEGER)')
+    cur.execute('CREATE TABLE pickups (id INTEGER PRIMARY KEY AUTOINCREMENT, arrival INTEGER, departure INTEGER, sequence INTEGER, trip_id INTEGER, stop_id INTEGER)')
+    cur.execute('CREATE TABLE service_periods (id INTEGER PRIMARY KEY AUTOINCREMENT, days INTEGER, start TEXT, finish TEXT)')
+    cur.execute('CREATE TABLE service_exceptions (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, exception_type INTEGER, service_period_id INTEGER)')
+    # android "specialness"
+    cur.execute('CREATE TABLE android_metadata (locale TEXT)')
+    cur.execute('INSERT INTO android_metadata (locale) VALUES ("ld_US");');
+    conn.commit()
+    cur.close()
+    return conn
+
+def make_indexes(conn):
+    cur = conn.cursor()
+    cur.execute('CREATE INDEX idx_stop_id_pickups ON pickups (stop_id)')
+    cur.execute('CREATE INDEX idx_trip_id_pickups ON pickups (trip_id)')
+    conn.commit()
+    cur.close()
+
+def time_to_secs(ts):
+    (h, m, s) = ts.split(':')
+    return int(s) + int(m) * 60 + int(h) * 3600
+
 def add_stop(cur, cache, parts):
     lat = 0.0
-    lon = 0.9
-    if not 0 == len(parts[4]):
-        lat = float(parts[4])
-    if not 0 == len(parts[5]):
-        lat = float(parts[5])
+    lon = 0.0
+    if not 0 == len(parts['stop_lat']):
+        lat = float(parts['stop_lat'])
+    if not 0 == len(parts['stop_lon']):
+        lon = float(parts['stop_lon'])
         
     cur.execute(
         'INSERT INTO stops (label,number,name,lat,lon) VALUES (?,?,?,?,?)',
-        [parts[0], parts[1], parts[2], lat, lon,]
+        [parts['stop_id'], parts['stop_code'], parts['stop_name'], lat, lon,]
         )
-    cache['stops'][parts[0]] = cur.lastrowid
+    cache['stops'][parts['stop_id']] = cur.lastrowid
 
 def add_route(cur, cache, parts):
     rt = 0
-    if not 0 == len(parts[4]):
-        rt = int(parts[4])
+    if not 0 == len(parts['route_type']):
+        rt = int(parts['route_type'])
     cur.execute(
         'INSERT INTO routes (name,route_type) VALUES (?,?)',
-        [parts[1], rt,]
+        [parts['route_short_name'], rt,]
         )
     
-    cache['routes'][parts[0]] = cur.lastrowid
+    cache['routes'][parts['route_id']] = cur.lastrowid
 
 def add_trip(cur, cache, parts):
-    route_id = cache['routes'][parts[0]]
-    service_period_id = cache['service_periods'][parts[1]]
+    route_id = cache['routes'][parts['route_id']]
+    service_period_id = cache['service_periods'][parts['service_id']]
     block = 0
-    if not 0 == len(parts[4]):
-        block = int(parts[4])
+    if not 0 == len(parts['block_id']):
+        block = int(parts['block_id'])
     cur.execute(
         'INSERT INTO trips (headsign,block,service_period_id,route_id) VALUES (?,?,?,?)',
-        [parts[3], block, service_period_id, route_id]
+        [parts['trip_headsign'], block, service_period_id, route_id]
         )
     
-    cache['trips'][parts[2]] = cur.lastrowid
+    cache['trips'][parts['trip_id']] = cur.lastrowid
 
 def add_pickup(cur, cache, parts):
-    trip_id = cache['trips'][parts[0]]
-    stop_id = cache['stops'][parts[3]]
+    trip_id = cache['trips'][parts['trip_id']]
+    stop_id = cache['stops'][parts['stop_id']]
 
     cur.execute(
         'INSERT INTO pickups (arrival, departure, sequence, trip_id, stop_id) VALUES (?,?,?,?,?)',
-        [schema.time_to_secs(parts[1]), schema.time_to_secs(parts[2]), int(parts[4]), trip_id, stop_id]
+        [time_to_secs(parts['arrival_time']), time_to_secs(parts['departure_time']), int(parts['stop_sequence']), trip_id, stop_id]
         )
 
 def add_service_period(cur, cache, parts):
     p = 0
     days = 0
-    for i in parts[1:8]:
-        days |= (int(i) << p)
+    names = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
+    for k in names:
+        days |= (int(parts[k]) << p)
         p += 1
     cur.execute(
         'INSERT INTO service_periods (days, start, finish) VALUES (?,?,?)',
-        [days, parts[8], parts[9]]
+        [days, parts['start_date'], parts['end_date']]
         )
-    cache['service_periods'][parts[0]] = cur.lastrowid
+    cache['service_periods'][parts['service_id']] = cur.lastrowid
 
 def add_service_exception(cur, cache, parts):
-    service_period_id = cache['service_periods'][parts[0]]
-    exception_type = int(parts[2])
+    service_period_id = cache['service_periods'][parts['service_id']]
+    exception_type = int(parts['exception_type'])
     cur.execute(
         'INSERT INTO service_exceptions (day, exception_type, service_period_id) VALUES (?,?,?)',
-        [parts[1], exception_type, service_period_id]
+        [parts['date'], exception_type, service_period_id]
         )
 
 class Msgs:
@@ -128,22 +158,25 @@ class Builder:
 
     def build(self, fuel):
         (t, fn) = fuel
-       
+
+        lf = open('log.txt', 'w')
+        
         with open('feed/%s.txt' % (t)) as f:
-            skip_one = True
             lines = f.readlines()
             tlc = len(lines)
-            lc = 0
-
-            for ln in lines:
-                if not skip_one:
-                    self._msg.show_step('%s %i/%i' % (t.ljust(15), lc + 1, tlc), False)
-                    parts = [p.replace('"', '').strip() for p in unicode(ln.rstrip(), 'utf_8').split(',')]
-                    cur = self._conn.cursor()
-                    fn(cur, self._cache, parts)
-                    cur.close()
-                else:
-                    skip_one = False
+            lc = 1
+            flds = lines[0].strip().split(',')
+            print >>lf, flds
+            for ln in lines[1:]:
+                self._msg.show_step('%s %i/%i' % (t.ljust(15), lc + 1, tlc), False)
+                raw_parts = [p.replace('"', '').strip() for p in unicode(ln.rstrip(), 'utf_8').split(',')]
+                cur = self._conn.cursor()
+                parts = {}
+                for i in range(0, len(flds)):
+                    parts[flds[i]] = raw_parts[i]
+                print >>lf, parts
+                fn(cur, self._cache, parts)
+                cur.close()
                 lc += 1
             self._msg.next_line()
         self._conn.commit()
@@ -156,36 +189,6 @@ builders = [
     ['trips',          add_trip],
     ['stop_times',     add_pickup],
 ]
-
-class StopUpdate:
-    def __init__(self, msg, tot):
-        self.m = 0
-        self._msg = msg
-        self._tot = tot
-        self._cur = 1
-
-    def update_stop(self, sch, in_id, ph_id, name):
-        stop = sch.find_stop_by_label(in_id)
-        if not stop:
-            self._msg.show_step('not found: %s (%i/%i)' % (in_id, self._cur, self._tot), False)
-            self.m += 1
-        else:
-            self._msg.show_step('updating: %s (%i/%i)' % (in_id, self._cur, self._tot), False)
-            stop.number = int(ph_id)
-            stop.update()
-        self._cur += 1
-
-def inject_stops(xfl, fl, msg):
-    msg.show('Injecting stop numbers from stops.xml')
-    sch = schema.Routing(fl)
-
-    msg.show_step('parsing %s' % (xfl))
-    tr = lxml.etree.parse(xfl)
-    elems = tr.xpath('/stops/marker')
-
-    upd = StopUpdate(msg, len(elems))
-    [upd.update_stop(sch, e.get('stopid'), e.get('id'), e.get('name')) for e in elems]
-    sch.commit()    
 
 def extract_member(z, mfl, msg):
     msg.show_step(mfl)
@@ -221,7 +224,7 @@ def run(ss, ofl, zfl):
         os.unlink(zfl)
 
     msg.show('Creating database in %s' % (ofl))
-    conn = schema.make(ofl)
+    conn = make_schema(ofl)
 
     msg.show('Converting GTFS feed to sqlite')    
 
@@ -229,9 +232,8 @@ def run(ss, ofl, zfl):
     [b.build(fuel) for fuel in builders]
 
     msg.show('Building indexes')
-    schema.make_indexes(conn)
+    make_indexes(conn)
 
-#    inject_stops('stops.xml', ofl, msg)
     msg.next_line()
 
 ofl = 'transit.db'
