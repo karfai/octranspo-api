@@ -27,9 +27,9 @@ def time_window_on_elapsed(secs)
   [el, el + secs] 
 end
 
-# If you want the logs displayed you have to do this before the call to setup
-DataMapper::Logger.new($stdout, :debug)
-DataMapper.setup(:default, 'sqlite:///home/don/src/projects/octranspo/octranspo-api/octranspo.sqlite3')
+# DataMapper::Logger.new($stdout, :debug)
+# sqlite:///home/don/src/projects/octranspo/octranspo-api/octranspo.sqlite3
+DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://localhost/octranspo')
 
 class ServicePeriod
   include DataMapper::Resource
