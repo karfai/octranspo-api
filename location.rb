@@ -36,6 +36,4 @@ class Stop
   def self.nearby(lat, lon, distance_in_meters)
     nearby_point(Geokit::LatLng.new(lat, lon), distance_in_meters)
   end
-
-  private :nearby_point
 end
