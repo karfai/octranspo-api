@@ -85,7 +85,6 @@ class ServicePeriod
     vals[:id] = id
     vals[:start] = start
     vals[:finish] = finish
-    i = 0
     vals[:days] = days_in_service
     vals
   end
@@ -104,7 +103,7 @@ end
 class Trip
   include DataMapper::Resource
 
-  property :id,     Serial
+  property :id,       Serial
   property :headsign, String
 
   belongs_to :service_period
