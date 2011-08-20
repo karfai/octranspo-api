@@ -19,6 +19,7 @@ require 'sinatra'
 require 'json'
 
 require './model'
+require './location'
 
 ## STOPS ##
 def show_all_stops
@@ -40,9 +41,23 @@ get '/stops/:number' do
   Stop.first(:number => params[:number].to_i).to_json
 end
 
+get '/stops/:number/nearby' do
+  meters = (params.key?('within')) ? params['within'].to_i : 400
+
+  content_type :json
+  Stop.first(:number => params[:number].to_i).nearby(meters).to_json
+end
+
 get '/stops_by_name/:name' do
   content_type :json
   Stop.all(:name.like => "%#{params[:name].upcase}%").to_json
+end
+
+get '/stops_nearby/:lat/:lon' do
+  meters = (params.key?('within')) ? params['within'].to_i : 400
+
+  content_type :json
+  Stop.nearby(params[:lat].to_f, params[:lon].to_f, meters).to_json
 end
 
 ## SERVICE PERIODS ##

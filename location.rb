@@ -15,8 +15,27 @@
 # You should have received a copy of the GNU General Public License
 # along with octranspo-api.  If not, see <http://www.gnu.org/licenses/>.
 
-require './model'
-require './location'
+require 'geokit'
 
-p Stop.nearby(45.3809, -75.7401, 400)
-p Stop.first(:number => 4817).nearby(400)
+require './model'
+
+def nearby_point(pt0, distance_in_meters)
+  kms = distance_in_meters / 1000.0
+
+  Stop.all.select do |st|
+    pt1 = Geokit::LatLng.new(st.lat, st.lon)
+    pt0.distance_to(pt1, { :units => :kms }) <= kms
+  end
+end
+
+class Stop
+  def nearby(distance_in_meters)
+    nearby_point(Geokit::LatLng.new(lat, lon), distance_in_meters)
+  end
+
+  def self.nearby(lat, lon, distance_in_meters)
+    nearby_point(Geokit::LatLng.new(lat, lon), distance_in_meters)
+  end
+
+  private :nearby_point
+end
