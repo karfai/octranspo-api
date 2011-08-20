@@ -38,9 +38,6 @@ def make_schema(dbf):
     cur.execute('CREATE TABLE pickups (id INTEGER PRIMARY KEY AUTOINCREMENT, arrival INTEGER, departure INTEGER, sequence INTEGER, trip_id INTEGER, stop_id INTEGER)')
     cur.execute('CREATE TABLE service_periods (id INTEGER PRIMARY KEY AUTOINCREMENT, days INTEGER, start TEXT, finish TEXT)')
     cur.execute('CREATE TABLE service_exceptions (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, exception_type INTEGER, service_period_id INTEGER)')
-    # android "specialness"
-    cur.execute('CREATE TABLE android_metadata (locale TEXT)')
-    cur.execute('INSERT INTO android_metadata (locale) VALUES ("ld_US");');
     conn.commit()
     cur.close()
     return conn
