@@ -136,8 +136,8 @@ class Stop
       tr = pi.trip
       if !in_service || (in_service && tr.service_period == csp)
         rt = "#{tr.route.name} #{tr.headsign}"
-        services[rt] = { :trips => [], :route => { :number => tr.route.name, :headsign => tr.headsign }, :service_periods => {} } if !services.key?(rt)
-        services[rt][:trips] << tr.id
+        services[rt] = { :arrivals => [], :route => { :number => tr.route.name, :headsign => tr.headsign }, :service_periods => {} } if !services.key?(rt)
+        services[rt][:arrivals] << pi.arrival
         services[rt][:service_periods][tr.service_period_id] = 1
       end
     end
@@ -155,7 +155,7 @@ class Stop
       end
       collated[k] = {
         :route => v[:route],
-        :trips => v[:trips],
+        :arrivals => v[:arrivals].sort,
         :days  => days.uniq,
       }
     end
