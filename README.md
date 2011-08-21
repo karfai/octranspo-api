@@ -36,10 +36,10 @@ NOTE: These are informational queries to access stop information **regardless** 
 - /stops_by_name/:name
   - Provides a set of stop details where the string in the :name parameter appears in the stop description.
 
-- /stops/:number/nearby[?within=<distance in meters>]
+- /stops/:number/nearby[?within=:distance in meters]
   - Provides details about stops geographically near the stop specified by number. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
-- /stops_nearby/:lat/:lon[?within=<distance in meters>]
+- /stops_nearby/:lat/:lon[?within=:distance in meters]
   - Provides a set of stops geographically near the latitude and longitude specified in the request. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
 - /stops_nearby/:lat/:lon/closest
@@ -60,10 +60,10 @@ Travel
 ------
 NOTE: These requests are run within the **current service period**.
 
-- /arrivals/:stop_number[?minutes=<number>]
+- /arrivals/:stop_number[?minutes=:number]
   - Provides upcoming (static) arrivals to the stop specified by number. The results from this request encode a JOIN of several tables that should provide enough information to encode a "bus". The optional "number" parameter can be used to specific a future time window in minutes. This defaults to 15 minutes.
 
-- /destinations/:trip_id/:sequence[?range=<number>]
+- /destinations/:trip_id/:sequence[?range=:number]
   - Provides details about the upcoming stops (static) on the route identified using "trip_id" and "sequence" information obtained via a request to "/arrivals" or a previous "/destinations" request. The results from this request are in the same format as the "/arrivals" request. The optional "range" parameter can be used to control the number of upcoming stops. The default value is 10.
 
 **NOTE**: Since this data is mined from the static schedule and since the current position of a trip is **not available** as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an **exercise for the reader** (hint: /stops_nearby/.../closest OR a **functioning live feed**).
@@ -105,13 +105,13 @@ Setup
 
 3. "Compile" the sqlite3 database (about 15 minutes)
 
-> python compile-database.py <sqlite db name> <gtfs zip file name>
+> python compile-database.py :sqlite_db_name :gtfs_zip_filename
 
 Deploy a local testing instance
 -------------------------------
 1. Local testing instance
 
-> DATABASE_URL=sqlite://<path to db file> rackup -p <port number> config.ru
+> DATABASE_URL=sqlite://:path to db file rackup -p :port_number config.ru
 
 The local-up.sh script is my testing script that probably tells you something meaningless about how I lay out my project directories. You could modify this if you like.
 
@@ -123,7 +123,7 @@ OR Deploy to heroku
 
 2. **When the db changes**: Push the db (about 25-30 minutes)
 
-> heroku db:push sqlite://$PWD/<db file name>
+> heroku db:push sqlite://$PWD/:db_file_name
 
 3. Deploy to heroku
 
