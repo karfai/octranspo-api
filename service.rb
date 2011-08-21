@@ -45,11 +45,24 @@ get '/stops/:number' do
   Stop.first(:number => params[:number].to_i).to_json
 end
 
+def show_nearby(it, meters)
+  it.nearby(meters).to_json
+end
+
+def show_closest(it)
+  it.nearby().first.to_json
+end
+
 get '/stops/:number/nearby' do
   meters = (params.key?('within')) ? params['within'].to_i : 400
 
   content_type :json
-  Stop.first(:number => params[:number].to_i).nearby(meters).to_json
+  show_nearby(Stop.first(:number => params[:number].to_i), meters)
+end
+
+get '/stops/:number/nearby/closest' do
+  content_type :json
+  show_closest(Stop.first(:number => params[:number].to_i))
 end
 
 get '/stops_by_name/:name' do
@@ -61,12 +74,12 @@ get '/stops_nearby/:lat/:lon' do
   meters = (params.key?('within')) ? params['within'].to_i : 400
 
   content_type :json
-  Stop.nearby(params[:lat].to_f, params[:lon].to_f, meters).to_json
+  show_nearby(Coords.new(params[:lat].to_f, params[:lon].to_f), meters)
 end
 
 get '/stops_nearby/:lat/:lon/closest' do
   content_type :json
-  Stop.nearby(params[:lat].to_f, params[:lon].to_f).to_json
+  show_closest(Coords.new(params[:lat].to_f, params[:lon].to_f))
 end
 
 ## SERVICE PERIODS ##
