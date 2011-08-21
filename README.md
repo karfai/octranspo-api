@@ -26,16 +26,16 @@ Stop information
 NOTE: These are informational queries to access stop information *regardless* of service period.
 
 - /stops
-  Provides a list of all the stops in the database. Provides basic stop information (number, name, latitude and longitude). *achtung*: This is an expensive query that will take many seconds to return.
+  - Provides a list of all the stops in the database. Provides basic stop information (number, name, latitude and longitude). *achtung*: This is an expensive query that will take many seconds to return.
 
 - /stops/:number
-  Provides details about a single stop associated with the stop number that appears in the physical signage for the stop.
+  - Provides details about a single stop associated with the stop number that appears in the physical signage for the stop.
 
 - /stops_by_name/:name
-  Provides a set of stop details where the string in the :name parameter appears in the stop description.
+  - Provides a set of stop details where the string in the :name parameter appears in the stop description.
 
 - /stops/:number/nearby[?within=<distance in meters>]
-  Provides details about stops geographically near the stop specified by number. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
+  - Provides details about stops geographically near the stop specified by number. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
 - /stops_nearby/:lat/:lon[?within=<distance in meters>]
   Provides a set of stops geographically near the latitude and longitude specified in the request. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
