@@ -88,7 +88,7 @@ Technical details
 =================
 This application is a RESTful data service providing JSON formatted results. It's implemented in Ruby using Sinatra as the web front and DataMapper as the ORM. Location computations are done with the geokit ruby gem (I reckon I've checked all the kool buzzwords). More enlightenment could be achieved by reading the code.
 
-WARNING to ruby purists: The database "compiler" is built in python. It was written in a different mood. I make no apologies.
+*Warning* to ruby purists: The database "compiler" is built in python. It was written in a different mood. I make no apologies.
 
 Deployment
 ==========
