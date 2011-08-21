@@ -49,6 +49,13 @@ def make_indexes(conn):
     conn.commit()
     cur.close()
 
+def make_version(conn, ver):
+    cur = conn.cursor()
+    cur.execute('CREATE TABLE versions (id INTEGER PRIMARY KEY AUTOINCREMENT, feed_version INTEGER)')
+    cur.execute('INSERT INTO versions (feed_version) VALUES (?)', [int(ver)])
+    conn.commit()
+    cur.close()
+
 def time_to_secs(ts):
     (h, m, s) = ts.split(':')
     return int(s) + int(m) * 60 + int(h) * 3600
@@ -222,6 +229,7 @@ def run(ss, ofl, zfl):
 
     msg.show('Creating database in %s' % (ofl))
     conn = make_schema(ofl)
+    make_version(conn, zfl.split('_')[1])
 
     msg.show('Converting GTFS feed to sqlite')    
 

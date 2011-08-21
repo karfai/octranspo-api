@@ -22,6 +22,9 @@ require 'rdiscount'
 require './model'
 require './location'
 
+# UPDATE me when new routes are added AND deployed
+API_VERSION = 1
+
 ## STOPS ##
 def show_all_stops
   # complete list of stops, no period
@@ -119,6 +122,13 @@ end
 ## DEFAULTS ##
 get '/' do
   markdown :readme
+end
+
+get '/version' do
+  ver = Version.first
+
+  content_type :json
+  { :api => API_VERSION, :feed => ver.feed_version }.to_json
 end
 
 not_found do

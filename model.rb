@@ -176,4 +176,11 @@ class Pickup
   end
 end
 
+class Version
+  include DataMapper::Resource
+
+  property :id,           Serial
+  property :feed_version, Integer
+end
+
 DataMapper.finalize
