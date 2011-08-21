@@ -28,12 +28,28 @@ def nearby_point(pt0, distance_in_meters)
   end
 end
 
+def closest_point(pt0)
+  rv = nil
+  least = 10000 # this should be far enough
+  Stop.all.select do |st|
+    pt1 = Geokit::LatLng.new(st.lat, st.lon)
+    dist = pt0.distance_to(pt1, { :units => :kms })
+    if dist < least
+      rv = st
+      least = dist
+    end
+  end
+
+  rv
+end
+
 class Stop
   def nearby(distance_in_meters)
     nearby_point(Geokit::LatLng.new(lat, lon), distance_in_meters)
   end
 
-  def self.nearby(lat, lon, distance_in_meters)
-    nearby_point(Geokit::LatLng.new(lat, lon), distance_in_meters)
+  def self.nearby(lat, lon, distance_in_meters=0)
+    pt = Geokit::LatLng.new(lat, lon)
+    (distance_in_meters > 0) ? nearby_point(pt, distance_in_meters) : closest_point(pt)
   end
 end

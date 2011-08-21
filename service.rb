@@ -60,6 +60,11 @@ get '/stops_nearby/:lat/:lon' do
   Stop.nearby(params[:lat].to_f, params[:lon].to_f, meters).to_json
 end
 
+get '/stops_nearby/:lat/:lon/closest' do
+  content_type :json
+  Stop.nearby(params[:lat].to_f, params[:lon].to_f).to_json
+end
+
 ## SERVICE PERIODS ##
 def show_current_service_period
   content_type :json
