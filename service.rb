@@ -111,6 +111,10 @@ get '/destinations/:trip_id/:sequence' do
 end
 
 ## DEFAULTS ##
+get '/' do
+  'octranspo-api'
+end
+
 not_found do
   { :error => 'not_found' }.to_json
 end
