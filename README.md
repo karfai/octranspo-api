@@ -38,32 +38,33 @@ NOTE: These are informational queries to access stop information *regardless* of
   - Provides details about stops geographically near the stop specified by number. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
 - /stops_nearby/:lat/:lon[?within=<distance in meters>]
-  Provides a set of stops geographically near the latitude and longitude specified in the request. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
+  - Provides a set of stops geographically near the latitude and longitude specified in the request. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
 - /stops_nearby/:lat/:lon/closest
-  Provides the stop details for the stop closest to the provided coordinates.
+  - Provides the stop details for the stop closest to the provided coordinates.
 
 Schedule information
 --------------------
 - /service_periods
-  Provides all of the different schedule sets for the current schedule. This covers issues like Saturday and Sunday service.
+  - Provides all of the different schedule sets for the current schedule. This covers issues like Saturday and Sunday service.
 
 - /service_periods/:id
-  Provides details about a particular period, by id.
+  - Provides details about a particular period, by id.
 
 - /service_periods/current
-  Provides details about the active schedule (using the time of the server).
+  - Provides details about the active schedule (using the time of the server).
 
 Travel
 ------
 NOTE: These requests are run within the *current service period*.
 
 - /arrivals/:stop_number[?minutes=<number>]
-  Provides upcoming (static) arrivals to the stop specified by number. The results from this request encode a JOIN of several tables that should provide enough information to encode a "bus". The optional "number" parameter can be used to specific a future time window in minutes. This defaults to 15 minutes.
+  - Provides upcoming (static) arrivals to the stop specified by number. The results from this request encode a JOIN of several tables that should provide enough information to encode a "bus". The optional "number" parameter can be used to specific a future time window in minutes. This defaults to 15 minutes.
 
 - /destinations/:trip_id/:sequence[?range=<number>]
-  Provides details about the upcoming stops (static) on the route identified using "trip_id" and "sequence" information obtained via a request to "/arrivals" or a previous "/destinations" request. The results from this request are in the same format as the "/arrivals" request. The optional "range" parameter can be used to control the number of upcoming stops. The default value is 10.
-  NOTE: Since this data is mined from the static schedule and since the current position of a trip is *not available* as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an *exercise for the reader* (hint: /stops_nearby/.../closest OR a *functioning live feed*).
+  - Provides details about the upcoming stops (static) on the route identified using "trip_id" and "sequence" information obtained via a request to "/arrivals" or a previous "/destinations" request. The results from this request are in the same format as the "/arrivals" request. The optional "range" parameter can be used to control the number of upcoming stops. The default value is 10.
+
+*NOTE*: Since this data is mined from the static schedule and since the current position of a trip is *not available* as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an *exercise for the reader* (hint: /stops_nearby/.../closest OR a *functioning live feed*).
 
 Examples
 ========
