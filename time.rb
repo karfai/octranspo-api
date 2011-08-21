@@ -4,6 +4,7 @@ require 'tzinfo'
 $ltz = TZInfo::Timezone.get('America/Montreal')
 
 def now()
+  p Time.now
   $ltz.utc_to_local(Time.now.utc)
 end
 
