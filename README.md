@@ -9,9 +9,9 @@ The source is available from github (https://github.com/karfai/octranspo-api) li
 
 Authors
 =======
-Don Kelly <karfai@gmail.com>
-https://github.com/karfai/
-http://www.strangeware.ca/
+Don Kelly <karfai@gmail.com>  
+https://github.com/karfai/  
+http://www.strangeware.ca/  
 
 Outstanding issues
 ==================
@@ -69,23 +69,20 @@ Examples
 ========
 Request stops in the vicinity of Bell St N and the Queensway
 
-> curl "http://octranspo-api.heroku.com/stops_nearby/45.40412/-75.7405"
-
-> [{"id":2586,"label":"NA430","number":8055,"name":"COLOMBINE / CHARDON","lat":45.4076,"lon":-75.73925},{"id":2588,"label":"NA440","number":8056,"name":"SIR FREDERICK BANTING / EGLANTINE","lat":45.40535,"lon":-75.741531},{"id":2603,"label":"NA910","number":3011,"name":"TUNNEY'S PASTURE 1B","lat":45.403652,"lon":-75.735596},{"id":2663,"label":"NC030","number":8058,"name":"SCOTT / SMIRLE","lat":45.402557,"lon":-75.737335}]
+    > curl "http://octranspo-api.heroku.com/stops_nearby/45.40412/-75.7405"
+    [{"id":2586,"label":"NA430","number":8055,"name":"COLOMBINE / CHARDON","lat":45.4076,"lon":-75.73925},{"id":2588,"label":"NA440","number":8056,"name":"SIR FREDERICK BANTING / EGLANTINE","lat":45.40535,"lon":-75.741531},{"id":2603,"label":"NA910","number":3011,"name":"TUNNEY'S PASTURE 1B","lat":45.403652,"lon":-75.735596},{"id":2663,"label":"NC030","number":8058,"name":"SCOTT / SMIRLE","lat":45.402557,"lon":-75.737335}]
 
 (output abbreviated)
 
 Request arrivals at a stop from that set (3011 TUNNEY'S PASTURE 1B):
 
-> curl "http://octranspo-api.heroku.com/arrivals/3011"
-
-> [{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66060,"departure":66060,"sequence":26},{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":12109,"route":"96","headsign":"Terry Fox"},"arrival":66360,"departure":66360,"sequence":13},{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":13263,"route":"98","headsign":"Tunney's Pasture"},"arrival":66540,"departure":66540,"sequence":52}]
+    > curl "http://octranspo-api.heroku.com/arrivals/3011"
+    [{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66060,"departure":66060,"sequence":26},{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":12109,"route":"96","headsign":"Terry Fox"},"arrival":66360,"departure":66360,"sequence":13},{"stop":{"number":3011,"name":"TUNNEY'S PASTURE 1A"},"trip":{"id":13263,"route":"98","headsign":"Tunney's Pasture"},"arrival":66540,"departure":66540,"sequence":52}]
 
 Request upcoming stops for a bus we got on (97 Bayshore @ T+66060s) further along the route (to announce the next stops):
 
-> curl "http://octranspo-api.heroku.com/destinations/12203/26?range=2"
-
-> [{"stop":{"number":3012,"name":"WESTBORO 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66180,"departure":66180,"sequence":27},{"stop":{"number":3013,"name":"DOMINION 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66240,"departure":66240,"sequence":28}]
+    > curl "http://octranspo-api.heroku.com/destinations/12203/26?range=2"
+    [{"stop":{"number":3012,"name":"WESTBORO 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66180,"departure":66180,"sequence":27},{"stop":{"number":3013,"name":"DOMINION 1A"},"trip":{"id":12203,"route":"97","headsign":"Bayshore"},"arrival":66240,"departure":66240,"sequence":28}]
 
 Technical details
 =================
