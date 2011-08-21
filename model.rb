@@ -37,6 +37,9 @@ class ServicePeriod
     dt = Date.today
     dts = dt.strftime('%Y%m%d')
 
+    p dt
+    p dts
+
     sp = nil
     ex = ServiceException.first(:day => dts)
     if ex
@@ -48,6 +51,7 @@ class ServicePeriod
     end
 
     if bl
+      p sp
       bl.call(sp)
     end
 
