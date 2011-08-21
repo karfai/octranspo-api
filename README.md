@@ -17,7 +17,7 @@ http://www.strangeware.ca/
 
 Outstanding issues
 ==================
-Currently (20110820), the service time zone **is not** considered. This will be fixed **soon**.
+Currently (20110821), arrivals after 23:59 on a current day are stored in elapsed seconds from midnight of the previous day. A reasonable *start of service* time needs to be derived.
 
 API
 ===
