@@ -4,13 +4,12 @@ require 'tzinfo'
 $ltz = TZInfo::Timezone.get('America/Montreal')
 
 def now()
-  p "NOW"
-  p $ltz.utc_to_local(Time.now.utc)
   $ltz.utc_to_local(Time.now.utc)
 end
 
 def today()
-  $ltz.utc_to_local(Date.today.to_time.utc)
+  dt = Date.today
+  Time.new(dt.year, dt.mon, dt.day, 0, 0, 0, 0)
 end
 
 def secs_elapsed_today
