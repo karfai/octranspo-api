@@ -15,7 +15,7 @@ http://www.strangeware.ca/
 
 Outstanding issues
 ==================
-Currently (20110820), the service time zone *is not* considered. This will be fixed *soon*.
+Currently (20110820), the service time zone **is not** considered. This will be fixed **soon**.
 
 API
 ===
@@ -23,10 +23,10 @@ The application provides JSON formatted data in response to a number HTTP reques
 
 Stop information
 ----------------
-NOTE: These are informational queries to access stop information *regardless* of service period.
+NOTE: These are informational queries to access stop information **regardless** of service period.
 
 - /stops
-  - Provides a list of all the stops in the database. Provides basic stop information (number, name, latitude and longitude). *achtung*: This is an expensive query that will take many seconds to return.
+  - Provides a list of all the stops in the database. Provides basic stop information (number, name, latitude and longitude). **Achtung**: This is an expensive query that will take many seconds to return.
 
 - /stops/:number
   - Provides details about a single stop associated with the stop number that appears in the physical signage for the stop.
@@ -56,7 +56,7 @@ Schedule information
 
 Travel
 ------
-NOTE: These requests are run within the *current service period*.
+NOTE: These requests are run within the **current service period**.
 
 - /arrivals/:stop_number[?minutes=<number>]
   - Provides upcoming (static) arrivals to the stop specified by number. The results from this request encode a JOIN of several tables that should provide enough information to encode a "bus". The optional "number" parameter can be used to specific a future time window in minutes. This defaults to 15 minutes.
@@ -64,7 +64,7 @@ NOTE: These requests are run within the *current service period*.
 - /destinations/:trip_id/:sequence[?range=<number>]
   - Provides details about the upcoming stops (static) on the route identified using "trip_id" and "sequence" information obtained via a request to "/arrivals" or a previous "/destinations" request. The results from this request are in the same format as the "/arrivals" request. The optional "range" parameter can be used to control the number of upcoming stops. The default value is 10.
 
-*NOTE*: Since this data is mined from the static schedule and since the current position of a trip is *not available* as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an *exercise for the reader* (hint: /stops_nearby/.../closest OR a *functioning live feed*).
+**NOTE**: Since this data is mined from the static schedule and since the current position of a trip is **not available** as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an **exercise for the reader** (hint: /stops_nearby/.../closest OR a **functioning live feed**).
 
 Examples
 ========
@@ -89,7 +89,7 @@ Technical details
 =================
 This application is a RESTful data service providing JSON formatted results. It's implemented in Ruby using Sinatra as the web front and DataMapper as the ORM. Location computations are done with the geokit ruby gem (I reckon I've checked all the kool buzzwords). More enlightenment could be achieved by reading the code.
 
-*Warning* to ruby purists: The database "compiler" is built in python. It was written in a different mood. I make no apologies.
+**Warning** to ruby purists: The database "compiler" is built in python. It was written in a different mood. I make no apologies.
 
 Deployment
 ==========
@@ -115,11 +115,11 @@ The local-up.sh script is my testing script that probably tells you something me
 
 OR Deploy to heroku
 -------------------
-1. *Once*: create a heroku application
+1. **Once**: create a heroku application
 
 > (visit heroku.com to learn how to do this incantation)
 
-2. *When the db changes*: Push the db (about 25-30 minutes)
+2. **When the db changes**: Push the db (about 25-30 minutes)
 
 > heroku db:push sqlite://$PWD/<db file name>
 
