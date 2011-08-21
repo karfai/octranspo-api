@@ -162,7 +162,7 @@ class Pickup
   end
 
   def next_in_sequence(range)
-    Pickup.all(:trip_id => trip_id, :sequence.gt => sequence, :sequence.lte => sequence + range)
+    Pickup.all(:trip_id => trip_id, :sequence.gt => sequence, :sequence.lte => sequence + range, :order => [:sequence])
   end
 
   def humanize()
