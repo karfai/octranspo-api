@@ -65,6 +65,16 @@ get '/stops/:number/nearby/closest' do
   show_closest(Stop.first(:number => params[:number].to_i))
 end
 
+get '/stops/:number/routes' do
+  content_type :json
+  Stop.first(:number => params[:number].to_i).routes(false).to_json
+end
+
+get '/stops/:number/routes/in_service' do
+  content_type :json
+  Stop.first(:number => params[:number].to_i).routes(true).to_json
+end
+
 get '/stops_by_name/:name' do
   content_type :json
   Stop.all(:name.like => "%#{params[:name].upcase}%").to_json

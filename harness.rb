@@ -18,5 +18,28 @@
 require './model'
 require './location'
 
-p Stop.nearby(45.3809, -75.7401, 400)
-p Stop.first(:number => 4817).nearby(400)
+st = Stop.first(:number => 3011)
+services = {}
+st.pickups.each do |pi|
+  tr = pi.trip
+  rt = "#{tr.route.name} #{tr.headsign}"
+  services[rt] = { :trips => [], :route => { :number => tr.route.name, :headsign => tr.headsign }, :service_periods => {} } if !services.key?(rt)
+  services[rt][:trips] << tr.id
+  services[rt][:service_periods][tr.service_period_id] = 1
+end
+
+services_human = {}
+services.each do |k, v|
+  days = []
+  v[:service_periods].each do |id, v|
+    sp = ServicePeriod.get(id)
+    days = days + sp.days_in_service
+  end
+  services_human[k] = {
+    :route => v[:route],
+    :trips => v[:trips],
+    :days  => days.uniq,
+  }
+end
+
+p services_human

@@ -54,6 +54,10 @@ class ServicePeriod
     sp
   end
 
+  def self.day_names()
+    [:mon, :tue, :wed, :thu, :fri, :sat, :sun]
+  end
+
   def contains_day_ordinal(d)
     (days & (1 << d)) > 0
   end
@@ -65,7 +69,7 @@ class ServicePeriod
 
   def days_in_service()
     i = 0
-    [:mon, :tue, :wed, :thu, :fri, :sat, :sun].select do |d|
+    ServicePeriod.day_names.select do |d|
       matches = contains_day_ordinal(i)
       i += 1
       matches
@@ -124,6 +128,46 @@ class Stop
   property :lon,    Float
 
   has n,   :pickups
+
+  def collect_pickup_services(in_service)
+    services = {}
+    csp = ServicePeriod.current
+    pickups.each do |pi|
+      tr = pi.trip
+      if !in_service || (in_service && tr.service_period == csp)
+        rt = "#{tr.route.name} #{tr.headsign}"
+        services[rt] = { :trips => [], :route => { :number => tr.route.name, :headsign => tr.headsign }, :service_periods => {} } if !services.key?(rt)
+        services[rt][:trips] << tr.id
+        services[rt][:service_periods][tr.service_period_id] = 1
+      end
+    end
+
+    services
+  end
+
+  def collate_pickup_services(services)
+    collated = {}
+    services.each do |k, v|
+      days = []
+      v[:service_periods].each do |id, v|
+        sp = ServicePeriod.get(id)
+        days = days + sp.days_in_service
+      end
+      collated[k] = {
+        :route => v[:route],
+        :trips => v[:trips],
+        :days  => days.uniq,
+      }
+    end
+
+    collated
+  end
+
+  def routes(in_service)
+    collate_pickup_services(collect_pickup_services(in_service)).values
+  end
+
+  private :collate_pickup_services, :collect_pickup_services
 end
 
 class Pickup
