@@ -31,7 +31,7 @@ end
 def closest_point(pt0)
   rv = nil
   least = 10000 # this should be far enough
-  Stop.all.select do |st|
+  Stop.all.each do |st|
     pt1 = Geokit::LatLng.new(st.lat, st.lon)
     dist = pt0.distance_to(pt1, { :units => :kms })
     if dist < least
