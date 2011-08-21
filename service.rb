@@ -102,21 +102,20 @@ end
 
 get '/arrivals/:stop_number' do
   minutes = (params.key?('minutes')) ? params[:minutes].to_i : 15
+  num = params[:stop_number].to_i
 
   content_type :json
-  Pickup.arriving_at_stop(params[:stop_number].to_i, minutes).collect do |pi|
-    pi.humanize
-  end.to_json
+  Pickup.arriving_at_stop(num, minutes).collect { |pi| pi.humanize }.to_json
 end
 
 get '/destinations/:trip_id/:sequence' do
   range = (params.key?('range')) ? params[:range].to_i : 10
+  trip_id = params[:trip_id].to_i
+  seq = params[:sequence].to_i
 
   content_type :json
-  pi = Pickup.first(:trip_id => params[:trip_id].to_i, :sequence => params[:sequence].to_i)
-  pi.next_in_sequence(range).collect do |npi|
-    npi.humanize
-  end.to_json
+  pi = Pickup.first(:trip_id => trip_id, :sequence => seq)
+  pi.next_in_sequence(range).collect { |npi| npi.humanize }.to_json
 end
 
 ## DEFAULTS ##
