@@ -17,11 +17,20 @@ http://www.strangeware.ca/
 
 Outstanding issues
 ==================
-Currently (20110821), arrivals after 23:59 on a current day are stored in elapsed seconds from midnight of the previous day. A reasonable *start of service* time needs to be derived.
+
+- arrivals after 23:59 on a current day are stored in elapsed seconds from midnight of the previous day. A reasonable *start of service* time needs to be derived
+- the time zone for the *schedule* needs to stored and delivered via /version
+- the database might store the famous OCTranspo time skew
 
 API
 ===
 The application provides JSON formatted data in response to a number HTTP requests:
+
+General
+-------
+
+- /version
+  - list current versions of the feed and the api as well as global information about the schedule.
 
 Stop information
 ----------------
@@ -33,11 +42,20 @@ NOTE: These are informational queries to access stop information **regardless** 
 - /stops/:number
   - Provides details about a single stop associated with the stop number that appears in the physical signage for the stop.
 
+- /stops/:number/nearby[?within=:distance in meters]
+  - Provides details about stops near the specified stop. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
+
+- /stops/:number/nearby/closest
+  - Provides details about the next closest stop.
+
+- /stops/:number/routes
+  - Provides a summary of routes which service the specified stop. Listed with the routes are the arrival times throughout the day and which days of the week the route is in service. This request could be used to populate a page that shows the printed schedules seen on physical signage.
+
+- /stops/:number/routes/in_service
+  - Provides a restricted set of route information limited to the current service period.
+
 - /stops_by_name/:name
   - Provides a set of stop details where the string in the :name parameter appears in the stop description.
-
-- /stops/:number/nearby[?within=:distance in meters]
-  - Provides details about stops geographically near the stop specified by number. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
 
 - /stops_nearby/:lat/:lon[?within=:distance in meters]
   - Provides a set of stops geographically near the latitude and longitude specified in the request. The optional "within" parameter can be used to change the distance tolerance (defaults to 400m).
