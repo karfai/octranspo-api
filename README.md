@@ -111,7 +111,7 @@ Deploy a local testing instance
 -------------------------------
 1. Local testing instance
 
-> DATABASE_URL=sqlite://:path to db file rackup -p :port_number config.ru
+> DATABASE_URL=sqlite://:path_to_dbfile rackup -p :port_number config.ru
 
 The local-up.sh script is my testing script that probably tells you something meaningless about how I lay out my project directories. You could modify this if you like.
 
