@@ -16,16 +16,8 @@
 # along with octranspo-api.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'data_mapper'
-require 'date'
 
-def secs_elapsed_today
-  (Time.now - Date.today.to_time).to_i
-end
-
-def time_window_on_elapsed(secs)
-  el = secs_elapsed_today
-  [el, el + secs] 
-end
+require './time'
 
 # DataMapper::Logger.new($stdout, :debug)
 # sqlite:///home/don/src/projects/octranspo/octranspo-api/octranspo.sqlite3
