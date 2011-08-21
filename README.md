@@ -2,6 +2,8 @@ Summary
 =======
 This is a simple wrapper around the OCTranspo (public transit service in Ottawa, ON, Canada). It's based off of the publicly available GTFS (http://code.google.com/transit/spec/transit_feed_specification.html) data for the service (http://www.gtfs-data-exchange.com/agency/oc-transpo/, http://www.octranspo1.com/files/google_transit.zip).
 
+A prototype instance has been deployed to heroku as http://octranspo-api.heroku.com/.
+
 Source code
 ===========
 

@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with octranspo-api.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'sinatra'
 require 'json'
+require 'sinatra'
+require 'rdiscount'
 
 require './model'
 require './location'
@@ -117,7 +118,7 @@ end
 
 ## DEFAULTS ##
 get '/' do
-  'octranspo-api'
+  markdown :readme
 end
 
 not_found do
