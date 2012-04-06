@@ -21,12 +21,12 @@ class Compiler
   def initialize(database_name, feed_version)
     @db = SQLite3::Database.new("#{database_name}.sqlite3")
 
+    @db.execute('CREATE TABLE service_periods (id INTEGER PRIMARY KEY AUTOINCREMENT, days INTEGER, start TEXT, finish TEXT)')
+    @db.execute('CREATE TABLE service_exceptions (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, exception_type INTEGER, service_period_id INTEGER)')
     @db.execute('CREATE TABLE stops (id INTEGER PRIMARY KEY AUTOINCREMENT, label TEXT, number INTEGER, name TEXT, lat FLOAT, lon FLOAT)')
     @db.execute('CREATE TABLE routes (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, route_type INTEGER)')
     @db.execute('CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT, headsign TEXT, block INTEGER, route_id INTEGER, service_period_id INTEGER)')
     @db.execute('CREATE TABLE pickups (id INTEGER PRIMARY KEY AUTOINCREMENT, arrival INTEGER, departure INTEGER, sequence INTEGER, trip_id INTEGER, stop_id INTEGER)')
-    @db.execute('CREATE TABLE service_periods (id INTEGER PRIMARY KEY AUTOINCREMENT, days INTEGER, start TEXT, finish TEXT)')
-    @db.execute('CREATE TABLE service_exceptions (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT, exception_type INTEGER, service_period_id INTEGER)')
     @db.execute('CREATE TABLE versions (id INTEGER PRIMARY KEY AUTOINCREMENT, api_version INTEGER, feed_version INTEGER)')
     @db.execute('INSERT INTO versions (api_version, feed_version) VALUES (?,?)', [1, feed_version])
     @cache = {
@@ -65,7 +65,7 @@ class Compiler
   end
 
   def add_service_exception(vals)
-    service_period_id = @cache[:service_periods][vals['service_id']]
+    service_period_id = @cache[:service_periods][vals['service_id']].to_i
     exception_type = vals['exception_type'].to_i
 
     @db.execute(
@@ -83,7 +83,7 @@ class Compiler
         
     @db.execute(
         'INSERT INTO stops (label,number,name,lat,lon) VALUES (?,?,?,?,?)',
-        [vals['stop_id'], vals['stop_code'], vals['stop_name'], lat, lon,]
+        [vals['stop_id'], vals['stop_code'].to_i, vals['stop_name'], lat, lon,]
         )
 
     @cache[:stops][vals['stop_id']] = @db.last_insert_row_id
@@ -102,8 +102,8 @@ class Compiler
   end
 
   def add_trips(vals)
-    route_id = @cache[:routes][vals['route_id']]
-    service_period_id = @cache[:service_periods][vals['service_id']]
+    route_id = @cache[:routes][vals['route_id']].to_i
+    service_period_id = @cache[:service_periods][vals['service_id']].to_i
     block = 0
     block = vals['block_id'].to_i unless 0 == vals['block_id'].length
 
