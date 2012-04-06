@@ -17,6 +17,8 @@
 
 require 'sqlite3'
 
+require './lib'
+
 class Compiler
   def initialize(database_name, feed_version)
     @db = SQLite3::Database.new("#{database_name}.sqlite3")
@@ -28,7 +30,7 @@ class Compiler
     @db.execute('CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT, headsign TEXT, block INTEGER, route_id INTEGER, service_period_id INTEGER)')
     @db.execute('CREATE TABLE pickups (id INTEGER PRIMARY KEY AUTOINCREMENT, arrival INTEGER, departure INTEGER, sequence INTEGER, trip_id INTEGER, stop_id INTEGER)')
     @db.execute('CREATE TABLE versions (id INTEGER PRIMARY KEY AUTOINCREMENT, api_version INTEGER, feed_version INTEGER)')
-    @db.execute('INSERT INTO versions (api_version, feed_version) VALUES (?,?)', [1, feed_version])
+    @db.execute('INSERT INTO versions (api_version, feed_version) VALUES (?,?)', [API_VERSION, feed_version])
     @cache = {
       :service_periods => {},
       :stops           => {},
@@ -43,6 +45,10 @@ class Compiler
       'trips'          => 'trips',
       'stop_times'     => 'pickups',
     }
+  end
+
+  def api_version
+    API_VERSION
   end
 
   def make_indexes()
