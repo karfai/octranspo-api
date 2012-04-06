@@ -121,9 +121,9 @@ Setup
 
 2. Get a recent ZIP archive of the GTFS data. It should be available from the sources mentioned above.
 
-3. "Compile" the sqlite3 database (about 15 minutes)
+3. "Compile" the sqlite3 database (about 5 minutes)
 
-> python compile-database.py :sqlite_db_name :gtfs_zip_filename
+> thor manage:compile :sqlite_db_name :gtfs_zip_filename
 
 Deploy a local testing instance
 -------------------------------
