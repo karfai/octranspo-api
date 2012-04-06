@@ -4,6 +4,8 @@ This is a simple wrapper around the OCTranspo (public transit service in Ottawa,
 
 A prototype instance has been deployed to heroku as http://octranspo-api.heroku.com/.
 
+The sqlite3 database provided by the compiler tool is also suitable for using on a mobile device. With indexes, the typical size is typically less then 100MB.
+
 Source code
 ===========
 
