@@ -20,6 +20,7 @@ require 'sinatra'
 require 'rdiscount'
 
 require './model'
+require './live'
 require './location'
 
 # UPDATE me when new routes are added AND deployed
@@ -128,7 +129,13 @@ get '/arrivals/:stop_number' do
   num = params[:stop_number].to_i
 
   content_type :json
-  Pickup.arriving_at_stop(num, minutes).collect { |pi| pi.humanize }.to_json
+  pickups = Pickup.arriving_at_stop(num, minutes).collect { |pi| pi.humanize }
+
+  # has the client given us some live api fuel? if so, let's try to merge it!
+  if params.key? 'app_id' and params.key? 'api_key'
+    pickups = Live.new(params['app_id'], params['api_key']).update_pickups(num, pickups)
+  end
+  pickups.to_json
 end
 
 get '/destinations/:trip_id/:sequence' do

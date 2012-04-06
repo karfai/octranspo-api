@@ -20,3 +20,8 @@ def time_window_on_elapsed(secs)
   el = secs_elapsed_today
   [el, el + secs] 
 end
+
+def hour_and_minutes_to_elapsed(s)
+  p = s.split(':')
+  p[0].to_i * 3600 + p[1].to_i * 60
+end
