@@ -80,7 +80,7 @@ Travel
 ------
 NOTE: These requests are run within the **current service period**.
 
-- /arrivals/:stop_number[?minutes=:number][@app_id=:id&api_key=:key]
+- /arrivals/:stop_number[?minutes=:number][&app_id=:id&api_key=:key]
   - Provides upcoming (static) arrivals to the stop specified by number. The results from this request encode a JOIN of several tables that should provide enough information to encode a "bus". The optional "number" parameter can be used to specific a future time window in minutes. This defaults to 15 minutes. If the optional app_id and api_key parameters are set, then we'll try to look up some live data from the OC Transpo live api (http://www.octranspo1.com/developers/documentation).
 
 - /destinations/:trip_id/:sequence[?range=:number]
