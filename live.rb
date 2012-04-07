@@ -24,8 +24,14 @@ class Live
         'Latitude'            => { :key => :latitude, :conv => lambda { |s| s.to_f } },
         'Longitude'           => { :key => :longitude, :conv => lambda { |s| s.to_f } },
         'GPSSpeed'            => { :key => :approximate_speed, :conv => lambda { |s| s.to_f } },
+      },
+      :route_summary => {
+        'RouteNo'      => { :key => :route_no, :conv => lambda { |s| s.to_i } },
+        'DirectionID'  => { :key => :direction_id, :conv => lambda { |s| s.to_i } },
+        'Direction'    => { :key => :direction, :conv => lambda { |s| s } },
+        'RouteHeading' => { :key => :heading, :conv => lambda { |s| s } },
       }
-    }
+   }
   end
 
   def update_pickups(stop_no, pickups)
@@ -66,23 +72,57 @@ class Live
     end if adjustments.length
   end
 
+  def arrivals(stop_no, route_no)
+    rv = []
+
+    next_for_route(stop_no, route_no) do |vals|
+      rv = vals
+    end
+
+    rv    
+  end
+
+  def routes(stop_no)
+    rv = []
+    # BUG: docs have <RoutesForStopData> as root node; running system yields <GetRouteSummaryForStopResult>
+    request('GetRouteSummaryForStop', 'GetRouteSummaryForStopResult', { 'stopNo' => stop_no }) do |root_node|
+      # BUG: we seem to get Routes/Route/node in cases of multiple routes, but Routes/Route in
+      # cases of single routes; therefore, do both and concatenate
+      multi = root_node.css('Routes/Route/node').collect do |pn|
+        apply_mapping(:route_summary, pn, { :stop_no => stop_no })
+      end
+      single = root_node.css('Routes/Route').collect do |pn|
+        apply_mapping(:route_summary, pn, { :stop_no => stop_no })
+      end
+      rv = multi + single
+    end
+
+    rv
+  end
+
   def request(op, root, payload)
     payload['appID'] = @app_id
     payload['apiKey'] = @api_key
-
+    
     resp = @conn.post("/#{op}", payload.join('=', '&'))
+    p resp.body
     yield(Nokogiri::XML(resp.body).css(root))
   end
-
+  
+  def apply_mapping(key, node, vals)
+    @mappings[key].each do |k, v|
+      n = node.css(k.to_s)
+      vals[v[:key].to_sym] = v[:conv].call(n.first.content) if n
+    end
+    
+    vals
+  end
+  
   def next_for_route(stop_no, route_no)
+    # BUG: docs have <StopInfoData> as root node; running system yields <GetNextTripsForStopResult>
     request('GetNextTripsForStop', 'GetNextTripsForStopResult', { 'stopNo' => stop_no, 'routeNo' => route_no }) do |root_node|
       arr = root_node.css('Trips/Trip/node').collect do |pn|
-        vals = { :stop_no => stop_no, :route_no => route_no }
-        @mappings[:next_for_route].each do |k, v|
-          n = pn.css(k.to_s)
-          vals[v[:key].to_sym] = v[:conv].call(n.first.content) if n
-        end
-        vals
+        apply_mapping(:next_for_route, pn, { :stop_no => stop_no, :route_no => route_no })
       end
       yield(arr)
     end

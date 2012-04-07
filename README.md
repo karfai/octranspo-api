@@ -88,6 +88,17 @@ NOTE: These requests are run within the **current service period**.
 
 **NOTE**: Since this data is mined from the static schedule and since the current position of a trip is **not available** as a live feed from the provider, it requires the use of :sequence to understand where the "bus" currently appears on the route trip. Calculating a :sequence correlated to the current position of the vehicle is left as an **exercise for the reader** (hint: /stops_nearby/.../closest OR a **functioning live feed**).
 
+Live API
+--------
+
+As of api_version 2, the API supports making raw queries of the live API. In all of these queries, api_key and app_id must be obtained from OC Transpo. We pass these through to the live API for you.
+
+- /live/routes/:stop_id?api_key=:key&app_id=:app_id
+  - Returns a list of routes *currently* serving this stop according to the live API. We assume that this might exclude trips which have been cancelled from the static schedule, but who knows?
+
+- /live/arrivals/:stop_id/:route_no?api_key=:key&app_id=:app_id
+  - Given a 4-digit stop number and a route number, this call will return live arrival times in JSON format. Timings in these results follow the same format as the static schedule. For example, the times are expressed in seconds since 00:00. This choice is so that live data can be correlated with the schedule.
+
 Examples
 ========
 Request stops in the vicinity of Bell St N and the Queensway

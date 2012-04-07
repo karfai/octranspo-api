@@ -145,6 +145,27 @@ get '/destinations/:trip_id/:sequence' do
   pi.next_in_sequence(range).collect { |npi| npi.humanize }.to_json
 end
 
+## LIVE ##
+get '/live/routes/:stop_id' do
+  rv = {}
+
+  if params.key? 'app_id' and params.key? 'api_key'
+    rv = Live.new(params['app_id'], params['api_key']).routes(params[:stop_id])
+  end
+
+  rv.to_json
+end
+
+get '/live/arrivals/:stop_no/:route_no' do
+  rv = {}
+
+  if params.key? 'app_id' and params.key? 'api_key'
+    rv = Live.new(params['app_id'], params['api_key']).arrivals(params[:stop_no], params[:route_no])
+  end
+
+  rv.to_json
+end
+
 ## DEFAULTS ##
 get '/' do
   markdown :readme
