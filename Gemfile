@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-gem 'data_mapper'
+gem 'data_mapper', ">= 1.1" 
 gem 'dm-postgres-adapter'
 gem 'faraday'
 gem 'geokit'
