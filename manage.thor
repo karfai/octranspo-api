@@ -57,7 +57,7 @@ class Manage < Thor
 
     members = ['calendar', 'calendar_dates', 'stops', 'routes', 'trips', 'stop_times']
 
-    puts "= Compiling (versions => [api: #{cmp.api_version}; feed: #{ver}])"
+    puts "= Compiling (versions => [schema: #{cmp.schema_version}; feed: #{ver}])"
     Zip::ZipFile.open(gtfs_zipfile) do |zf|
       members.each do |m|
         cmp.add(m, zf.read("#{m}.txt"), progress)

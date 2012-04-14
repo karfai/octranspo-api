@@ -30,7 +30,7 @@ class Compiler
     @db.execute('CREATE TABLE trips (id INTEGER PRIMARY KEY AUTOINCREMENT, headsign TEXT, block INTEGER, route_id INTEGER, service_period_id INTEGER)')
     @db.execute('CREATE TABLE pickups (id INTEGER PRIMARY KEY AUTOINCREMENT, arrival INTEGER, departure INTEGER, sequence INTEGER, trip_id INTEGER, stop_id INTEGER)')
     @db.execute('CREATE TABLE versions (id INTEGER PRIMARY KEY AUTOINCREMENT, api_version INTEGER, feed_version INTEGER)')
-    @db.execute('INSERT INTO versions (api_version, feed_version) VALUES (?,?)', [API_VERSION, feed_version])
+    @db.execute('INSERT INTO versions (api_version, feed_version) VALUES (?,?)', [schema_version, feed_version])
     @cache = {
       :service_periods => {},
       :stops           => {},
@@ -47,8 +47,8 @@ class Compiler
     }
   end
 
-  def api_version
-    API_VERSION
+  def schema_version
+    SCHEMA_VERSION
   end
 
   def make_indexes()

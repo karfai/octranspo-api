@@ -215,9 +215,9 @@ end
 class Version
   include DataMapper::Resource
 
-  property :id,           Serial
-  property :api_version,  Integer
-  property :feed_version, Integer
+  property :id,             Serial
+  property :schema_version, Integer
+  property :feed_version,   Integer
 end
 
 DataMapper.finalize

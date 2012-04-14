@@ -175,7 +175,7 @@ get '/version' do
   ver = Version.first
 
   content_type :json
-  { :api => ver.api_version, :feed => ver.feed_version }.to_json
+  { :api => API_VERSION, :schema => ver.schema_version, :feed => ver.feed_version }.to_json
 end
 
 not_found do
