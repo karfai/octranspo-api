@@ -90,35 +90,6 @@ get '/stops_nearby/:lat/:lon/closest' do
   show_closest(Coords.new(params[:lat].to_f, params[:lon].to_f))
 end
 
-## SERVICE PERIODS ##
-def show_current_service_period
-  content_type :json
-  ServicePeriod.current.humanize.to_json
-end
-
-def show_service_period(id)
-  content_type :json
-  sp = id == 'current' ? ServicePeriod.current : ServicePeriod.get(id.to_i)
-  sp.humanize.to_json
-end
-
-def show_all_service_periods
-  content_type :json
-  ServicePeriod.all.collect { |sp| sp.humanize }.to_json
-end
-
-get '/service_periods' do
-  show_all_service_periods
-end
-
-get '/service_periods/' do
-  show_all_service_periods
-end
-
-get '/service_periods/:id' do
-  show_service_period params[:id]
-end
-
 ## TRAVEL ##
 
 get '/arrivals/:stop_number' do

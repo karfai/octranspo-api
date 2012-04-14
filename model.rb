@@ -33,25 +33,10 @@ class ServicePeriod
 
   has n,   :trips
 
-  def self.current(&bl)
-    dt = Date.today
-    dts = dt.strftime('%Y%m%d')
-
-    sp = nil
-    ex = ServiceException.first(:day => dts)
-    if ex
-      sp = ex.service_period
-    else
-      sp = all(:start.lte => dts, :finish.gte => dts).select do |spi|
-        spi.match_date_in_days(dt)
-      end.first
-    end
-
-    if bl
-      bl.call(sp)
-    end
-
-    sp
+  def in_service?()
+    # NOTE: don't check exceptions -- this ServicePeriod is valid
+    # $today of it's own right
+    match_date_in_days(Date.today)
   end
 
   def self.day_names()
@@ -63,7 +48,7 @@ class ServicePeriod
   end
 
   def match_date_in_days(dt)
-    # moday == 0 i/t feed
+    # monday == 0 i/t feed
     contains_day_ordinal(dt.wday == 0 ? 6 : dt.wday - 1)
   end
 
@@ -86,6 +71,11 @@ class ServicePeriod
   end
 end
 
+# TODO: figure out what to do with ServiceExceptions. now that we always
+# use ServicePeriod.in_service? do we really need to check otherwise?
+# TODO: related to above: maybe some routes have sp:id0, normally, but use
+# exceptions to remove service at certain times? this would mean that we need to
+# check the exception_type
 class ServiceException
   include DataMapper::Resource
 
@@ -94,6 +84,14 @@ class ServiceException
   property   :exception_type, Integer
 
   belongs_to :service_period
+
+  def addition?()
+    1 == exception_type
+  end
+
+  def reduction?()
+    2 == exception_type
+  end
 end
 
 class Trip
@@ -131,10 +129,9 @@ class Stop
 
   def collect_pickup_services(in_service)
     services = {}
-    csp = ServicePeriod.current
     pickups.each do |pi|
       tr = pi.trip
-      if !in_service || (in_service && tr.service_period == csp)
+      if !in_service || (in_service && tr.service_period.in_service?)
         rt = "#{tr.route.name} #{tr.headsign}"
         services[rt] = { :arrivals => [], :route => { :number => tr.route.name, :headsign => tr.headsign }, :service_periods => {} } if !services.key?(rt)
         services[rt][:arrivals] << pi.arrival
@@ -183,14 +180,12 @@ class Pickup
   belongs_to :stop
 
   def self.pickups_at_stop_in_range(stop_number, range)
-    rv = []
-    ServicePeriod.current do |sp|
-      rv = Stop.first(:number => stop_number).pickups.all(:arrival.gte => range[0], :arrival.lte => range[1], :order => [:arrival.asc]).select do |pi|
-        pi.trip.service_period_id == sp.id
-      end
+    Stop.first(:number => stop_number).pickups.all(
+      :arrival.gte => range[0],
+      :arrival.lte => range[1],
+      :order => [:arrival.asc]).select do |pi|
+        pi.trip.service_period.in_service?
     end
-
-    rv
   end
 
   def self.arriving_at_stop(stop_number, minutes)
