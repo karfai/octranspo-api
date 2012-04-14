@@ -50,7 +50,8 @@ class Manage < Thor
     ver = options[:version].length > 0 ? options[:version].to_i : determine_version(gtfs_zipfile)
 
     puts "= Removing old database (#{database_name}.sqlite3)"
-    File.delete("#{database_name}.sqlite3")
+    fn = "#{database_name}.sqlite3"
+    File.delete(fn) if File.exist? fn
 
     cmp = Compiler.new(database_name, ver)
     progress = TermProgress.new
