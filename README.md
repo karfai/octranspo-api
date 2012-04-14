@@ -65,17 +65,6 @@ NOTE: These are informational queries to access stop information **regardless** 
 - /stops_nearby/:lat/:lon/closest
   - Provides the stop details for the stop closest to the provided coordinates.
 
-Schedule information
---------------------
-- /service_periods
-  - Provides all of the different schedule sets for the current schedule. This covers issues like Saturday and Sunday service.
-
-- /service_periods/:id
-  - Provides details about a particular period, by id.
-
-- /service_periods/current
-  - Provides details about the active schedule (using the time of the server).
-
 Travel
 ------
 NOTE: These requests are run within the **current service period**.
