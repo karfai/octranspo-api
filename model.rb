@@ -36,10 +36,9 @@ class ServicePeriod
 
   has n,   :trips
 
-  def in_service?(dt=nil)
+  def in_service?(dt)
     # NOTE: don't check exceptions -- this ServicePeriod is valid
     # $today of it's own right
-    dt = Date.today if not dt
     dts = dt.strftime('%Y%m%d')
     start <= dts && finish >= dts && match_date_in_days(dt)
   end
@@ -188,7 +187,7 @@ class Pickup
   belongs_to :trip
   belongs_to :stop
 
-  def self.pickups_at_stop_in_range(stop_number, range, dt=nil)
+  def self.pickups_at_stop_in_range(stop_number, range, dt)
     Stop.first(:number => stop_number).pickups.all(
       :arrival.gte => range[0],
       :arrival.lte => range[1],
@@ -198,6 +197,7 @@ class Pickup
   end
 
   def self.arriving_at_stop(stop_number, minutes, dt=nil, seconds_since_midnight=nil)
+    dt = Date.today if not dt
     window_secs = minutes * 60
     range = time_window_on_elapsed(window_secs)
     range = [seconds_since_midnight, seconds_since_midnight + window_secs] if seconds_since_midnight
