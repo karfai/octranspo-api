@@ -16,12 +16,15 @@
 # along with octranspo-api.  If not, see <http://www.gnu.org/licenses/>.
 
 require 'data_mapper'
+require 'sinatra'
 
 require './time'
 
 # DataMapper::Logger.new($stdout, :debug)
-# sqlite:///home/don/src/projects/octranspo/octranspo-api/octranspo.sqlite3
 DataMapper.setup(:default, ENV['DATABASE_URL'] || 'postgres://localhost/octranspo')
+configure :test do
+  DataMapper.setup(:default, 'sqlite::memory:')
+end
 
 class ServicePeriod
   include DataMapper::Resource
@@ -33,10 +36,11 @@ class ServicePeriod
 
   has n,   :trips
 
-  def in_service?()
+  def in_service?(dt=nil)
     # NOTE: don't check exceptions -- this ServicePeriod is valid
     # $today of it's own right
-    match_date_in_days(Date.today)
+    dts = dt.strftime('%Y%m%d')
+    start <= dts && finish >= dts && match_date_in_days(dt ? dt : Date.today)
   end
 
   def self.day_names()
@@ -68,6 +72,10 @@ class ServicePeriod
     vals[:finish] = finish
     vals[:days] = days_in_service
     vals
+  end
+
+  def to_s
+    "#{id}: [#{start} => #{finish}]: #{days_in_service}"
   end
 end
 
@@ -179,17 +187,20 @@ class Pickup
   belongs_to :trip
   belongs_to :stop
 
-  def self.pickups_at_stop_in_range(stop_number, range)
+  def self.pickups_at_stop_in_range(stop_number, range, dt=nil)
     Stop.first(:number => stop_number).pickups.all(
       :arrival.gte => range[0],
       :arrival.lte => range[1],
       :order => [:arrival.asc]).select do |pi|
-        pi.trip.service_period.in_service?
+        pi.trip.service_period.in_service? dt
     end
   end
 
-  def self.arriving_at_stop(stop_number, minutes)
-    pickups_at_stop_in_range(stop_number, time_window_on_elapsed(minutes * 60))
+  def self.arriving_at_stop(stop_number, minutes, dt=nil, seconds_since_midnight=nil)
+    window_secs = minutes * 60
+    range = time_window_on_elapsed(window_secs)
+    range = [seconds_since_midnight, seconds_since_midnight + window_secs] if seconds_since_midnight
+    pickups_at_stop_in_range(stop_number, range, dt)
   end
 
   def next_in_sequence(range)

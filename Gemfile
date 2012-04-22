@@ -7,3 +7,7 @@ gem 'nokogiri'
 gem 'rdiscount'
 gem 'sinatra'
 gem 'tzinfo'
+
+group :test do
+  gem "rspec"
+end
