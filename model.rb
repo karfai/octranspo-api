@@ -39,8 +39,9 @@ class ServicePeriod
   def in_service?(dt=nil)
     # NOTE: don't check exceptions -- this ServicePeriod is valid
     # $today of it's own right
+    dt = Date.today if not dt
     dts = dt.strftime('%Y%m%d')
-    start <= dts && finish >= dts && match_date_in_days(dt ? dt : Date.today)
+    start <= dts && finish >= dts && match_date_in_days(dt)
   end
 
   def self.day_names()
