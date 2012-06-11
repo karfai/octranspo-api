@@ -111,7 +111,7 @@ class Compiler
     route_id = @cache[:routes][vals['route_id']].to_i
     service_period_id = @cache[:service_periods][vals['service_id']].to_i
     block = 0
-    block = vals['block_id'].to_i unless 0 == vals['block_id'].length
+    block = vals['block_id'].to_i unless !vals.key?('block_id') || 0 == vals['block_id'].length
 
     @db.execute(
         'INSERT INTO trips (headsign,block,service_period_id,route_id) VALUES (?,?,?,?)',
