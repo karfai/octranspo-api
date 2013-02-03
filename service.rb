@@ -20,6 +20,7 @@ require 'sinatra'
 require 'rdiscount'
 
 require './model'
+require './lib'
 require './live'
 require './location'
 
