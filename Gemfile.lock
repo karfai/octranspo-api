@@ -69,8 +69,8 @@ GEM
     multipart-post (1.1.5)
     nokogiri (1.5.2)
     progressbar (0.12.0)
-    rack (1.4.1)
-    rack-protection (1.2.0)
+    rack (1.6.11)
+    rack-protection (1.5.5)
       rack
     rdiscount (1.6.8)
     rspec (2.9.0)
